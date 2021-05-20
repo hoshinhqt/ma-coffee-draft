@@ -1,0 +1,85 @@
+---
+title: "btl_coffee"
+output: html_document
+Ten: Nguyễn Huỳnh Quỳnh Thoa
+MSHV: 1970075
+---
+#' title:  "Xử lý dataset"
+#' import dataset
+
+#import lib
+```{r}
+install.packages("readxl")
+install.packages("agricolae")
+install.packages("FactoMineR")
+```
+
+
+```{r}
+library(utf8)
+library(readxl)
+library(ggplot2)
+library(factoextra)
+library(FactoMineR)
+#library(Factoshiny)
+```
+
+
+```{r}
+data.coffee <- read_excel("/Users/nguyenthoa/Documents/nhqthoa.sdh19/4Multivariate analysis/BTL/dataset.xlsx")
+names(data.coffee)
+```
+
+#result <- PCAshiny(data.coffee)
+#PCAshiny(result)
+
+### Tiến hành phân tích trên nhóm 2
+
+### Mô tả dữ liệu nhóm 1
+
+Dữ liệu nhóm 1 bao gồm 1306 cá nhân và 25 biến thông tin về cá nhân và cà phê RANG XAY.
+
+Trong 25 biến:
+  --- Biến định lượng bổ sung: `Độ tuổi`
+
+  --- Biến định tính bổ sung: các biến liên quan đến những yếu tố dưới đây ảnh hưởng đến việc lựa chọn mua sản phẩm , mức độ yêu thích của người tiêu dùng đối với sản phẩm và đặc tính của cà phê
+  
+  --- Biến kích hoạt: các biến còn lại được sử dụng làm biến kích hoạt
+  #phan tich ket qua mca
+
+```{r}
+data.group2 <- data.coffee[c(2:9,134:137,177:186,201:209)]
+#dinh dang lai du lieu
+data.group2[,"Chọn nhãn hiệu CÀ PHÊ HÒA TAN 2IN1 mà anh/ chị TỪNG SỬ DỤNG. Cho biết mức độ yêu thích của anh/chị [G7]"] <- as.factor(data.group2[,"Chọn nhãn hiệu CÀ PHÊ HÒA TAN 2IN1 mà anh/ chị TỪNG SỬ DỤNG. Cho biết mức độ yêu thích của anh/chị [G7]"]);
+summary(data.group2[,"Chọn nhãn hiệu CÀ PHÊ HÒA TAN 2IN1 mà anh/ chị TỪNG SỬ DỤNG. Cho biết mức độ yêu thích của anh/chị [G7]"]);
+
+names(data.group2)
+
+ncol(data.group2)
+dim(data.group2)
+
+cols <- c(1,3:ncol(data.group2))
+data.group2[cols] <-lapply(data.group2[cols], factor)
+data.group2[2] <- as.numeric(unlist(data.group2[2]))
+
+data.group2[c(17:25)] <-lapply(data.group2[c(17:25)], as.factor)
+colnames(data.group2[c(2:8,17:25)])
+MCA(data.group2[c(7:8,17:25)],quali.sup=c((ncol(data.group2[c(17:25)])-1):ncol(data.group2[c(17:25)])),graph=TRUE)
+```
+
+
+```{r}
+eigenvalue.group2 <- get_eigenvalue(res.mca.group2)
+head(round(eigenvalue.group2, 2))
+```
+#phan tich muc do yeu thich qua pca
+
+```{r}
+colnames(data.group2[c(9:16)])#mức độ yêu thích -> sử dụng đánh giá PCA -> do vậy phải ép về numeric
+data.group2[c(9:16)] <-lapply(data.group2[c(9:16)], as.numeric)
+summary(data.group2[c(2,9:16)])
+res.pca <-PCA(data.group2[c(2,9:16)],quanti.sup=ncol(data.group2[c(9:16)]), graph=TRUE)
+
+```
+# => Từng nhóm độ tuổi sẽ yêu thích những loại cà phê 2in1 nào.
+
